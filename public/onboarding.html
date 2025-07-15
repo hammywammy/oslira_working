@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Your AI Outreach Profile - Oslira</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #F5F9FF 0%, #E8F3FF 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        } 
+        
+        .onboarding-container {
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            padding: 24px; 
+        }
+        
+        .onboarding-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(45, 108, 223, 0.15);
+            padding: 48px;
+            border: 1px solid rgba(45, 108, 223, 0.1);
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2D6CDF;
+            margin-bottom: 8px;
+        }
+        
+        .logo p {
+            color: #6B7280;
+            font-size: 16px;
+        }
+        
+        .progress-section {
+            margin-bottom: 40px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            background: #F5F9FF;
+            height: 8px;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            border: 1px solid #C9CEDC;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #2D6CDF, #8A6DF1);
+            width: 20%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
+        }
+        
+        .progress-text {
+            text-align: center;
+            font-size: 14px;
+            color: #6B7280;
+            font-weight: 500;
+        }
+        
+        .step {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        .step.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .step-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #2D6CDF, #8A6DF1);
+            color: white;
+            border-radius: 50%;
+            line-height: 32px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+        
+        h2 {
+            color: #121417;
+            margin-bottom: 8px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        .step-description {
+            color: #6B7280;
+            margin-bottom: 32px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #121417;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .label-help {
+            font-weight: 400;
+            color: #6B7280;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #C9CEDC;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            background: #F5F9FF;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #2D6CDF;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(45, 108, 223, 0.1);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            line-height: 1.5;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 40px;
+        }
+        
+        button {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #2D6CDF, #8A6DF1);
+            color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(45, 108, 223, 0.3);
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(45, 108, 223, 0.4);
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #2D6CDF;
+            border: 2px solid #2D6CDF;
+        }
+        
+        .btn-secondary:hover:not(:disabled) {
+            background: #2D6CDF;
+            color: white;
+        }
+        
+        .auth-check, .loading-state, .error-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+        
+        .spinner {
+            border: 3px solid #F5F9FF;
+            border-top: 3px solid #2D6CDF;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-message {
+            color: #EF4444;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        
+        .success-state {
+            background: linear-gradient(135deg, #53E1C5, #8A6DF1);
+            color: white;
+            padding: 32px;
+            border-radius: 16px;
+            text-align: center;
+        }
+        
+        .success-state h2 {
+            color: white;
+            margin-bottom: 16px;
+        }
+        
+        .success-state p {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        
+        .input-example {
+            font-size: 12px;
+            color: #8A6DF1;
+            margin-top: 6px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Check State -->
+    <div id="authCheck" class="onboarding-container">
+        <div class="onboarding-card auth-check">
+            <div class="spinner"></div>
+            <p>Verifying authentication...</p>
+        </div>
+    </div>
+    
+    <!-- Main Onboarding Form -->
+    <div id="onboardingMain" class="onboarding-container" style="display: none;">
+        <div class="onboarding-card">
+            <div class="logo">
+                <h1>Welcome to Oslira</h1>
+                <p>Let's set up your AI-powered outreach profile</p>
+            </div>
+            
+            <div class="progress-section">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress"></div>
+                </div>
+                <div class="progress-text" id="progress-text">Step 1 of 5</div>
+            </div>
+
+            <form id="onboarding-form">
+                <!-- Step 1: Business Identity -->
+                <div class="step active" id="step-1">
+                    <div class="step-header">
+                        <div class="step-number">1</div>
+                        <h2>What's your business?</h2>
+                        <p class="step-description">This helps our AI understand your brand and industry context for better messaging.</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="business-name">
+                            Business Name
+                            <div class="label-help">Your company or personal brand name</div>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="business-name" 
+                            required 
+                            placeholder="e.g., TechFlow Solutions"
+                        />
+                        <div class="input-example">This will appear in your outreach messages</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="business-niche">
+                            Your Industry/Niche
+                            <div class="label-help">What sector do you operate in?</div>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="business-niche" 
+                            required 
+                            placeholder="e.g., SaaS, E-commerce, Consulting"
+                        />
+                        <div class="input-example">Helps AI understand your market positioning</div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-primary" onclick="nextStep()">Continue</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Target Market -->
+                <div class="step" id="step-2">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <h2>Who are you targeting?</h2>
+                        <p class="step-description">Define your ideal customer so our AI can identify and score the best prospects.</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="target-audience">
+                            Target Audience
+                            <div class="label-help">Who is your ideal customer?</div>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="target-audience" 
+                            required 
+                            placeholder="e.g., SaaS founders, E-commerce CMOs, Tech VPs"
+                        />
+                        <div class="input-example">Be specific about roles, company types, or demographics</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="target-problems">
+                            What Problems Do They Have?
+                            <div class="label-help">What challenges or pain points do they face?</div>
+                        </label>
+                        <textarea 
+                            id="target-problems" 
+                            required 
+                            placeholder="e.g., Struggling to scale their sales team, manual lead qualification taking too much time, low response rates from cold outreach"
+                        ></textarea>
+                        <div class="input-example">This helps AI craft messages that resonate with their actual needs</div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="prevStep()">Back</button>
+                        <button type="button" class="btn-primary" onclick="nextStep()">Continue</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Value Proposition -->
+                <div class="step" id="step-3">
+                    <div class="step-header">
+                        <div class="step-number">3</div>
+                        <h2>What's your unique solution?</h2>
+                        <p class="step-description">Your value proposition helps AI create compelling, differentiated outreach messages.</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="value-proposition">
+                            How Do You Solve Their Problems?
+                            <div class="label-help">What specific value or outcome do you provide?</div>
+                        </label>
+                        <textarea 
+                            id="value-proposition" 
+                            required 
+                            placeholder="e.g., We help SaaS companies automate their lead qualification process, reducing manual work by 80% while increasing qualified leads by 3x through AI-powered prospect analysis"
+                        ></textarea>
+                        <div class="input-example">Focus on specific outcomes and benefits</div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="prevStep()">Back</button>
+                        <button type="button" class="btn-primary" onclick="nextStep()">Continue</button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Messaging Style -->
+                <div class="step" id="step-4">
+                    <div class="step-header">
+                        <div class="step-number">4</div>
+                        <h2>How do you communicate?</h2>
+                        <p class="step-description">This helps our AI match your personal communication style and tone.</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="communication-style">
+                            Your Communication Style
+                            <div class="label-help">How do you typically reach out to prospects?</div>
+                        </label>
+                        <select id="communication-style" required>
+                            <option value="">Choose your style...</option>
+                            <option value="professional-formal">Professional & Formal</option>
+                            <option value="friendly-casual">Friendly & Casual</option>
+                            <option value="direct-concise">Direct & Concise</option>
+                            <option value="consultative-helpful">Consultative & Helpful</option>
+                            <option value="data-driven-analytical">Data-Driven & Analytical</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message-example">
+                            Sample Message (Optional)
+                            <div class="label-help">Share an example of how you typically reach out</div>
+                        </label>
+                        <textarea 
+                            id="message-example" 
+                            placeholder="e.g., Hi John, saw your recent post about scaling challenges. I help SaaS founders like you automate their sales process without adding headcount. Worth a quick chat?"
+                        ></textarea>
+                        <div class="input-example">This helps AI learn your specific voice and approach</div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="prevStep()">Back</button>
+                        <button type="button" class="btn-primary" onclick="nextStep()">Continue</button>
+                    </div>
+                </div>
+
+                <!-- Step 5: Success Metrics -->
+                <div class="step" id="step-5">
+                    <div class="step-header">
+                        <div class="step-number">5</div>
+                        <h2>What does success look like?</h2>
+                        <p class="step-description">Understanding your goals helps our AI optimize for the right outcomes.</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="success-outcome">
+                            Ideal Outcome from Outreach
+                            <div class="label-help">What happens when outreach works perfectly?</div>
+                        </label>
+                        <select id="success-outcome" required>
+                            <option value="">Choose primary outcome...</option>
+                            <option value="book-demo">Book a product demo</option>
+                            <option value="schedule-call">Schedule discovery call</option>
+                            <option value="start-conversation">Start a conversation</option>
+                            <option value="download-content">Download content/resources</option>
+                            <option value="partnership-discussion">Discuss partnership opportunities</option>
+                            <option value="custom">Other (specify below)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="call-to-action">
+                            Your Typical Call-to-Action
+                            <div class="label-help">How do you typically ask for the next step?</div>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="call-to-action" 
+                            required 
+                            placeholder="e.g., Worth a 15-min chat?, Open to a quick call?, Interested in seeing how this works?"
+                        />
+                        <div class="input-example">Keep it conversational and low-pressure</div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" onclick="prevStep()">Back</button>
+                        <button type="submit" class="btn-primary">Complete Setup</button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Success -->
+            <div class="success-state" id="success" style="display: none;">
+                <h2>🚀 Your AI profile is ready!</h2>
+                <p>You've been credited with <strong>5 free analysis credits</strong> to test the system.</p>
+                <p style="margin-top: 16px;">Redirecting to your dashboard...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="onboarding-container" style="display: none;">
+        <div class="onboarding-card error-state">
+            <h2>Setup Issue</h2>
+            <p class="error-message" id="errorMessage">Unable to verify your session.</p>
+            <button class="btn-primary" onclick="window.location.href='auth.html'">Back to Login</button>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="loadingState" class="onboarding-container" style="display: none;">
+        <div class="onboarding-card loading-state">
+            <div class="spinner"></div>
+            <p>Setting up your AI profile...</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <script>
+        let currentStep = 1;
+        let currentUser = null;
+        let supabase = null;
+
+        // Initialize app immediately when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Oslira onboarding loaded');
+            initializeApp();
+        });
+
+        async function initializeApp() {
+            try {
+                // Try to initialize Supabase first
+                await initializeSupabase();
+                
+                // Check authentication
+                await checkAuth();
+                
+            } catch (error) {
+                console.error('💥 App initialization failed:', error);
+                showError(`Initialization failed: ${error.message}`);
+            }
+        }
+
+        async function initializeSupabase() {
+            try {
+                console.log('🔍 Initializing Supabase...');
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+                
+                const response = await fetch('/api/config', {
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error(`Config API failed: ${response.status}`);
+                }
+                
+                const config = await response.json();
+                
+                if (!config.supabaseUrl || !config.supabaseAnonKey) {
+                    throw new Error('Invalid config received');
+                }
+                
+                supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, {
+                    auth: {
+                        autoRefreshToken: true,
+                        persistSession: true
+                    }
+                });
+                
+                console.log('✅ Supabase initialized');
+                
+            } catch (error) {
+                console.error('❌ Supabase init failed:', error.message);
+                throw new Error('Failed to load configuration. Please check your API endpoint.');
+            }
+        }
+
+        async function checkAuth() {
+            try {
+                console.log('🔍 Checking authentication...');
+                
+                if (!supabase) {
+                    throw new Error('Supabase not initialized');
+                }
+                
+                // Handle magic link tokens
+                const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                const accessToken = hashParams.get('access_token');
+                
+                if (accessToken) {
+                    console.log('🎟️ Magic link tokens found, processing...');
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    if (window.history && window.history.replaceState) {
+                        window.history.replaceState(null, '', window.location.pathname);
+                    }
+                }
+                
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error) {
+                    throw new Error('Session error: ' + error.message);
+                }
+                
+                if (!session) {
+                    throw new Error('No active session found. Please log in first.');
+                }
+                
+                console.log('✅ Session found for user:', session.user.email);
+                currentUser = session.user;
+                
+                // Check if onboarding already completed
+                await checkOnboardingStatus();
+                
+            } catch (err) {
+                console.error('💥 Auth check error:', err);
+                showError(err.message);
+            }
+        }
+
+        async function checkOnboardingStatus() {
+            try {
+                console.log('🔍 Checking onboarding status...');
+                
+                const { data: userData, error } = await supabase
+                    .from('users')
+                    .select('onboarding_completed')
+                    .eq('id', currentUser.id)
+                    .single();
+                
+                if (error && error.code !== 'PGRST116') {
+                    console.error('❌ Error checking onboarding status:', error);
+                    // Continue anyway if there's an error
+                }
+                
+                if (userData?.onboarding_completed) {
+                    console.log('✅ User already completed onboarding - redirecting to dashboard');
+                    window.location.href = 'dashboard.html';
+                    return;
+                }
+                
+                console.log('🔍 User needs to complete onboarding');
+                showOnboardingForm();
+                
+            } catch (err) {
+                console.error('💥 Onboarding status check error:', err);
+                // If error, show onboarding anyway
+                showOnboardingForm();
+            }
+        }
+
+        function showOnboardingForm() {
+            hideAllStates();
+            document.getElementById('onboardingMain').style.display = 'block';
+        }
+
+        function showError(message) {
+            hideAllStates();
+            document.getElementById('errorState').style.display = 'block';
+            document.getElementById('errorMessage').textContent = message;
+        }
+
+        function showLoading() {
+            hideAllStates();
+            document.getElementById('loadingState').style.display = 'block';
+        }
+
+        function hideAllStates() {
+            document.getElementById('authCheck').style.display = 'none';
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('errorState').style.display = 'none';
+            document.getElementById('onboardingMain').style.display = 'none';
+        }
+
+        function nextStep() {
+            if (validateCurrentStep()) {
+                if (currentStep < 5) {
+                    document.getElementById(`step-${currentStep}`).classList.remove('active');
+                    currentStep++;
+                    document.getElementById(`step-${currentStep}`).classList.add('active');
+                    updateProgress();
+                }
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 1) {
+                document.getElementById(`step-${currentStep}`).classList.remove('active');
+                currentStep--;
+                document.getElementById(`step-${currentStep}`).classList.add('active');
+                updateProgress();
+            }
+        }
+
+        function updateProgress() {
+            const progress = (currentStep / 5) * 100;
+            document.getElementById('progress').style.width = progress + '%';
+            document.getElementById('progress-text').textContent = `Step ${currentStep} of 5`;
+        }
+
+        function validateCurrentStep() {
+            const stepElement = document.getElementById(`step-${currentStep}`);
+            const requiredFields = stepElement.querySelectorAll('input[required], textarea[required], select[required]');
+            let isValid = true;
+
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    field.style.borderColor = '#EF4444';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '#C9CEDC';
+                }
+            });
+
+            if (!isValid) {
+                alert('Please fill in all required fields');
+            }
+
+            return isValid;
+        }
+
+async function submitForm() {
+    try {
+        if (!validateCurrentStep()) return;
+        if (!currentUser || !supabase) throw new Error('Not properly authenticated');
+
+        showLoading();
+
+        // User table update
+        const userUpdate = {
+            id: currentUser.id,
+            email: currentUser.email,
+            credits: 5,
+            subscription_plan: 'free',
+            subscription_status: 'active',
+            onboarding_completed: true,
+            updated_at: new Date().toISOString()
+        };
+
+        // Business profiles table insertion
+        const profileData = {
+            user_id: currentUser.id,
+            business_name: document.getElementById("business-name").value.trim(),
+            business_niche: document.getElementById("business-niche").value.trim(),
+            target_audience: document.getElementById("target-audience").value.trim(),
+            target_problems: document.getElementById("target-problems").value.trim(),
+            value_proposition: document.getElementById("value-proposition").value.trim(),
+            communication_style: document.getElementById("communication-style").value,
+            message_example: document.getElementById("message-example").value.trim(),
+            success_outcome: document.getElementById("success-outcome").value,
+            call_to_action: document.getElementById("call-to-action").value.trim(),
+            is_active: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        };
+
+        // Insert user data
+        const { error: userError } = await supabase
+            .from("users")
+            .upsert(userUpdate, { onConflict: 'id' });
+
+        if (userError) throw new Error(`User update failed: ${userError.message}`);
+
+        // Insert profile data
+        const { error: profileError } = await supabase
+            .from("business_profiles")
+            .insert(profileData);
+
+        if (profileError) throw new Error(`Profile insertion failed: ${profileError.message}`);
+
+        hideAllStates();
+        document.getElementById('onboarding-form').style.display = 'none';
+        document.getElementById('success').style.display = 'block';
+
+        setTimeout(() => window.location.href = 'dashboard.html', 3000);
+
+    } catch (err) {
+        console.error('Form submission error:', err);
+        showError(`Setup failed: ${err.message}`);
+    }
+}
+
+document.getElementById('onboarding-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    submitForm();
+});
+
+
+        // Handle enter key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+                e.preventDefault();
+                if (currentStep < 5) {
+                    nextStep();
+                } else {
+                    submitForm();
+                }
+            }
+        });
+
+        // Auth state listener
+        if (window.supabase) {
+            window.addEventListener('load', () => {
+                if (supabase) {
+                    supabase.auth.onAuthStateChange((event, session) => {
+                        if (event === 'SIGNED_OUT') {
+                            window.location.href = 'auth.html';
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>

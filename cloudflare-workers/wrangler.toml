@@ -1,0 +1,22 @@
+name = "ai-outreach-api"
+account_id = "ec3a04af3fca5fbb10ec831616e63cfc"
+workers_dev = true
+compatibility_date = "2025-07-09"
+main = "src/index.ts"
+
+[vars]
+SUPABASE_URL = "https://jswzzihuqtjqvobfosks.supabase.co"
+
+# wrangler.toml (wrangler v3.88.0^)
+[observability.logs]
+enabled = false
+
+
+
+
+
+# Secrets are set via 'wrangler secret put' command
+# SUPABASE_SERVICE_ROLE - set as secret
+# OPENAI_KEY - set as secret  
+# CLAUDE_KEY - set as secret
+# APIFY_API_TOKEN - set as secret

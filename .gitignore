@@ -1,0 +1,11 @@
+.env
+.dev.vars
+cloudflare-workers/.dev.vars
+node_modules/ 
+*.log
+**/.dev.vars
+node_modules/
+package-lock.json
+
+# Configuration files with sensitive data
+config.js 

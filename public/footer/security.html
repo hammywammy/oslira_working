@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security - Oslira</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #F5F9FF;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(45, 108, 223, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2D6CDF;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #6B7280;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: #2D6CDF;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #2D6CDF, #8A6DF1);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .hero-section {
+            text-align: center;
+            padding: 4rem 0;
+            background: linear-gradient(135deg, #F5F9FF 0%, #E8F3FF 100%);
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #121417;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #2D6CDF, #8A6DF1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: #6B7280;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .security-overview {
+            background: white;
+            margin: 2rem 0;
+            padding: 3rem 0;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(45, 108, 223, 0.1);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #121417;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .section-content {
+            font-size: 1.1rem;
+            color: #4A5568;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .security-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .security-feature {
+            background: #F5F9FF;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #E5E7EB;
+            transition: all 0.3s ease;
+        }
+
+        .security-feature:hover {
+            transform: translateY(-4px);
+            border-color: #2D6CDF;
+            box-shadow: 0 8px 25px rgba(45, 108, 223, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #121417;
+            margin-bottom: 1rem;
+        }
+
+        .feature-description {
+            color: #6B7280;
+            line-height: 1.6;
+        }
+
+        .compliance-section {
+            background: linear-gradient(135deg, #2D6CDF, #8A6DF1);
+            color: white;
+            text-align: center;
+            padding: 4rem 0;
+            margin: 3rem 0;
+            border-radius: 16px;
+        }
+
+        .compliance-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .compliance-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .compliance-badges {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .compliance-badge {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .badge-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .badge-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge-description {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .technical-details {
+            background: white;
+            margin: 2rem 0;
+            padding: 3rem 0;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(45, 108, 223, 0.1);
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .detail-section {
+            background: #F5F9FF;
+            padding: 2rem;
+            border-radius: 12px;
+            border-left: 4px solid #2D6CDF;
+        }
+
+        .detail-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #121417;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .detail-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .detail-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .detail-list li:last-child {
+            border-bottom: none;
+        }
+
+        .check-icon {
+            color: #10B981;
+            font-weight: bold;
+        }
+
+        .contact-security {
+            background: white;
+            padding: 3rem 0;
+            margin: 2rem 0;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(45, 108, 223, 0.1);
+            text-align: center;
+        }
+
+        .contact-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #121417;
+            margin-bottom: 1rem;
+        }
+
+        .contact-description {
+            font-size: 1.1rem;
+            color: #6B7280;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .contact-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .contact-method {
+            background: #F5F9FF;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 2px solid #E5E7EB;
+        }
+
+        .contact-method-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #2D6CDF;
+        }
+
+        .contact-method-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #121417;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-method-description {
+            color: #6B7280;
+            margin-bottom: 1rem;
+        }
+
+        .contact-method-action {
+            background: #2D6CDF;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+
+        .contact-method-action:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        .footer {
+            background: #121417;
+            color: white;
+            padding: 3rem 0 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #2D6CDF;
+        }
+
+        .footer-section a {
+            color: #9CA3AF;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #374151;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            text-align: center;
+            color: #9CA3AF;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .security-features,
+            .details-grid,
+            .contact-methods {
+                grid-template-columns: 1fr;
+            }
+
+            .compliance-badges {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <div class="logo">Oslira</div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/about.html">About</a>
+                <a href="/pricing.html">Pricing</a>
+                <a href="/security.html">Security</a>
+                <a href="/help.html">Help</a>
+            </div>
+            <a href="/auth.html" class="cta-button">Get Started</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">Enterprise Security</h1>
+            <p class="hero-subtitle">Your data security is our top priority. Learn about our comprehensive security measures and compliance standards.</p>
+        </div>
+    </section>
+
+    <!-- Security Overview -->
+    <section class="security-overview">
+        <div class="container">
+            <h2 class="section-title">Security First Approach</h2>
+            <div class="section-content">
+                <p>[INSERT SECURITY PHILOSOPHY AND COMMITMENT STATEMENT]</p>
+            </div>
+            <div class="security-features">
+                <div class="security-feature">
+                    <div class="feature-icon">🔐</div>
+                    <h3 class="feature-title">End-to-End Encryption</h3>
+                    <p class="feature-description">[DETAILS ABOUT ENCRYPTION STANDARDS AND IMPLEMENTATION]</p>
+                </div>
+                <div class="security-feature">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 class="feature-title">Zero Trust Architecture</h3>
+                    <p class="feature-description">[DETAILS ABOUT ZERO TRUST SECURITY MODEL]</p>
+                </div>
+                <div class="security-feature">
+                    <div class="feature-icon">👁️</div>
+                    <h3 class="feature-title">Continuous Monitoring</h3>
+                    <p class="feature-description">[DETAILS ABOUT SECURITY MONITORING AND THREAT DETECTION]</p>
+                </div>
+                <div class="security-feature">
+                    <div class="feature-icon">🔑</div>
+                    <h3 class="feature-title">Access Controls</h3>
+                    <p class="feature-description">[DETAILS ABOUT AUTHENTICATION AND AUTHORIZATION]</p>
+                </div>
+                <div class="security-feature">
+                    <div class="feature-icon">📋</div>
+                    <h3 class="feature-title">Regular Audits</h3>
+                    <p class="feature-description">[DETAILS ABOUT SECURITY AUDITS AND ASSESSMENTS]</p>
+                </div>
+                <div class="security-feature">
+                    <div class="feature-icon">🚨</div>
+                    <h3 class="feature-title">Incident Response</h3>
+                    <p class="feature-description">[DETAILS ABOUT INCIDENT RESPONSE PROCEDURES]</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Compliance Section -->
+    <section class="compliance-section">
+        <div class="container">
+            <h2 class="compliance-title">Compliance & Certifications</h2>
+            <p class="compliance-subtitle">We maintain the highest standards of compliance with industry regulations and security frameworks</p>
+            <div class="compliance-badges">
+                <div class="compliance-badge">
+                    <div class="badge-icon">📜</div>
+                    <h3 class="badge-title">[COMPLIANCE 1]</h3>
+                    <p class="badge-description">[DESCRIPTION OF COMPLIANCE STANDARD]</p>
+                </div>
+                <div class="compliance-badge">
+                    <div class="badge-icon">🔒</div>
+                    <h3 class="badge-title">[COMPLIANCE 2]</h3>
+                    <p class="badge-description">[DESCRIPTION OF COMPLIANCE STANDARD]</p>
+                </div>
+                <div class="compliance-badge">
+                    <div class="badge-icon">🛡️</div>
+                    <h3 class="badge-title">[COMPLIANCE 3]</h3>
+                    <p class="badge-description">[DESCRIPTION OF COMPLIANCE STANDARD]</p>
+                </div>
+                <div class="compliance-badge">
+                    <div class="badge-icon">📋</div>
+                    <h3 class="badge-title">[COMPLIANCE 4]</h3>
+                    <p class="badge-description">[DESCRIPTION OF COMPLIANCE STANDARD]</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Details -->
+    <section class="technical-details">
+        <div class="container">
+            <h2 class="section-title">Technical Security Measures</h2>
+            <div class="details-grid">
+                <div class="detail-section">
+                    <h3 class="detail-title">🔐 Data Protection</h3>
+                    <ul class="detail-list">
+                        <li><span class="check-icon">✓</span> [ENCRYPTION STANDARD] encryption at rest</li>
+                        <li><span class="check-icon">✓</span> [ENCRYPTION STANDARD] encryption in transit</li>
+                        <li><span class="check-icon">✓</span> [DATA BACKUP DETAILS]</li>
+                        <li><span class="check-icon">✓</span> [DATA RETENTION POLICY]</li>
+                        <li><span class="check-icon">✓</span> [DATA DELETION PROCEDURES]</li>
+                    </ul>
+                </div>
+                <div class="detail-section">
+                    <h3 class="detail-title">🌐 Infrastructure Security</h3>
+                    <ul class="detail-list">
+                        <li><span class="check-icon">✓</span> [CLOUD PROVIDER] secure infrastructure</li>
+                        <li><span class="check-icon">✓</span> [NETWORK SECURITY MEASURES]</li>
+                        <li><span class="check-icon">✓</span> [FIREWALL CONFIGURATION]</li>
+                        <li><span class="check-icon">✓</span> [INTRUSION DETECTION SYSTEMS]</li>
+                        <li><span class="check-icon">✓</span> [DDOS PROTECTION]</li>
+                    </ul>
+                </div>
+                <div class="detail-section">
+                    <h3 class="detail-title">👤 Access Management</h3>
+                    <ul class="detail-list">
+                        <li><span class="check-icon">✓</span> [AUTHENTICATION METHOD]</li>
+                        <li><span class="check-icon">✓</span> [MULTI-FACTOR AUTHENTICATION]</li>
+                        <li><span class="check-icon">✓</span> [ROLE-BASED ACCESS CONTROL]</li>
+                        <li><span class="check-icon">✓</span> [SESSION MANAGEMENT]</li>
+                        <li><span class="check-icon">✓</span> [PRIVILEGED ACCESS MONITORING]</li>
+                    </ul>
+                </div>
+                <div class="detail-section">
+                    <h3 class="detail-title">📊 Monitoring & Logging</h3>
+                    <ul class="detail-list">
+                        <li><span class="check-icon">✓</span> [LOGGING STANDARDS]</li>
+                        <li><span class="check-icon">✓</span> [REAL-TIME MONITORING]</li>
+                        <li><span class="check-icon">✓</span> [ANOMALY DETECTION]</li>
+                        <li><span class="check-icon">✓</span> [AUDIT TRAIL MAINTENANCE]</li>
+                        <li><span class="check-icon">✓</span> [ALERT SYSTEMS]</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security Contact -->
+    <section class="contact-security">
+        <div class="container">
+            <h2 class="contact-title">Security Inquiries</h2>
+            <p class="contact-description">Have questions about our security practices or need to report a security issue? We're here to help.</p>
+            <div class="contact-methods">
+                <div class="contact-method">
+                    <div class="contact-method-icon">🚨</div>
+                    <h3 class="contact-method-title">Report Security Issue</h3>
+                    <p class="contact-method-description">Found a security vulnerability? Report it to our security team immediately.</p>
+                    <a href="mailto:[SECURITY_EMAIL]" class="contact-method-action">Report Issue</a>
+                </div>
+                <div class="contact-method">
+                    <div class="contact-method-icon">📋</div>
+                    <h3 class="contact-method-title">Security Documentation</h3>
+                    <p class="contact-method-description">Request detailed security documentation for enterprise compliance.</p>
+                    <a href="/contact.html" class="contact-method-action">Request Docs</a>
+                </div>
+                <div class="contact-method">
+                    <div class="contact-method-icon">🤝</div>
+                    <h3 class="contact-method-title">Compliance Questions</h3>
+                    <p class="contact-method-description">Questions about compliance standards or certifications we maintain.</p>
+                    <a href="/contact.html" class="contact-method-action">Contact Team</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Product</h4>
+                <a href="/features.html">Features</a>
+                <a href="/pricing.html">Pricing</a>
+                <a href="/integrations.html">Integrations</a>
+                <a href="/api.html">API</a>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <a href="/about.html">About Us</a>
+                <a href="/careers.html">Careers</a>
+                <a href="/press.html">Press</a>
+                <a href="/contact.html">Contact</a>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <a href="/help.html">Help Center</a>
+                <a href="/case-studies.html">Case Studies</a>
+                <a href="/blog.html">Blog</a>
+                <a href="/webinars.html">Webinars</a>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <a href="/privacy.html">Privacy Policy</a>
+                <a href="/terms.html">Terms of Service</a>
+                <a href="/security.html">Security</a>
+                <a href="/compliance.html">Compliance</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Oslira. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security - Oslira</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #F5F9FF;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(45, 108, 223, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2D6CDF;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #6B7280;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: #2D6CDF;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, #2D6CDF, #8A6DF1);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .hero-section {
+            text-align: center;
+            padding: 4rem 0;
+            background: linear-gradient(135deg, #F5F9FF 0%, #E8F3FF 100%);
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            color: #121417;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #2D6CDF, #8A6DF1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: #6B7280;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .security-overview {
+            background: white;
+            margin: 2rem 0;
+            padding: 3rem 0;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(45, 108, 223, 0.1);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #121417;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .section-content {
+            font-size: 1.1rem;
+            color: #4A5568;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .security-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .security-feature {
+            background: #F5F9FF;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #E5E7EB;
+            transition: all 0.3s ease;
+        }
+
+        .security-feature:hover {
+            transform: translateY(-4px);
+            border-color: #2D6CDF;
+            box-shadow: 0 8px 25px rgba(45, 108, 223, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #121417;
+            margin-bottom: 1rem;
+        }
+
+        .feature-description {
+            color: #6B7280;
+            line-height: 1.6;
+        }
+
+        .compliance-section {
+            background: linear-gradient(135deg, #2D6CDF, #8A6DF1);
+            color: white;
+            text-align: center;
+            padding: 4rem 0;
+            margin: 3rem 0;
+            border-radius: 16px;
+        }
+
+        .compliance-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .compliance-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .compliance-badges {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .compliance-badge {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2rem;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .badge-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .badge-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge-description {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .technical-details {
+            background: white;
+            margin: 2rem 0;
+            padding: 3rem 0;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(45, 108, 223, 0.1);
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .detail-section {
+            background: #F5F9FF;
+            padding: 2rem;
+            border-radius: 12px;
+            border-left: 4px solid #2D6CDF;
+        }
+
+        .detail-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #121417;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .detail-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .detail-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #E5E7EB;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .detail-list li:last-child {
+            border-bottom: none;
+        }
+
+        .check-icon {
+            color: #10B981;
+            font-weight: bold;
+        }
+
+        .contact-security {
+            background: white;
+            padding: 3rem 0;
+            margin: 2rem 0;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(45, 108, 223, 0.1);
+            text-align: center;
+        }
+
+        .contact-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #121417;
+            margin-bottom: 1rem;
+        }
+
+        .contact-description {
+            font-size: 1.1rem;
+            color: #6B7280;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .contact-methods {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .contact-method {
+            background: #F5F9FF;
+            padding: 2rem;
+            border-radius: 12px;
+            border: 2px solid #E5E7EB;
+        }
+
+        .contact-method-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #2D6CDF;
+        }
+
+        .contact-method-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #121417;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-method-description {
+            color: #6B7280;
+            margin-bottom: 1rem;
+        }
+
+        .contact-method-action {
+            background: #2D6CDF;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            transition: transform 0.2s;
+        }
+
+        .contact-method-action:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Footer */
+        .footer {
+            background: #121417;
+            color: white;
+            padding: 3rem 0 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h4 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #2D6CDF;
+        }
+
+        .footer-section a {
+            color: #9CA3AF;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #374151;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            text-align: center;
+            color: #9CA3AF;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .security-features,
+            .details-grid,
+            .contact-methods {
+                grid-template-columns: 1fr;
+            }
+
+            .compliance-badges {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav-container">
+            <div class="logo">Oslira</div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/about.html">About</a>
+                <a href="/pricing.html">Pricing</a>
+                <a href="/security.html">Security</a>
+                <a href="/help.html">Help</a>
+            </div>
+            <a href="/auth.html" class="cta-button">Get Started</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">Enterprise Security</h1>
+            <p class="hero-subtitle">Your data security is our top priority. Learn about our comprehensive security measures and compliance standards.</p>
+        </div>
+    </section>
+
+    <!-- Security Overview -->
+    <section class="security-overview">
+        <div class="container">
+            <h2 class="section-title">Security First Approach</h2>
+            <div class="section-content">
+                <p>[INSERT SECURITY PHILOSOPHY AND COMMITMENT STATEMENT]</p>
+            </div>
+            <div class="security-features">
+                <div class="security-feature">
+                    <div class="feature-icon">🔐</div>
+                    <h3 class="feature-title">End-to-End Encryption</h3>
+                    <p class="feature-description">[DETAILS ABOUT ENCRYPTION STANDARDS AND IMPLEMENTATION]</p>
+                </div>
+                <div class="security-feature">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 class="feature-title">Zero Trust Architecture</h3>
+                    <p class="feature-description">[DETAILS ABOUT ZERO TRUST SECURITY MODEL]</p>
+                </div>
+                <div class="security-feature">
+                    <div class="feature-icon">👁️</div>
+                    <h3 class="feature-title">Continuous Monitoring</h3>
+                    <p class="feature-description">[DETAILS ABOUT SECURITY MONITORING AND THREAT DETECTION]</p>
+                </div>
+                <div class="security-feature">
+                    <div class="feature-icon">🔑</div>
+                    <h3 class="feature-title">Access Controls</h3>
+                    <p class="feature-description">[DETAILS ABOUT AUTHENTICATION AND AUTHORIZATION]</p>
+                </div>
+                <div class="security-feature">
+                    <div class="feature-icon">📋</div>
+                    <h3 class="feature-title">Regular Audits</h3>
+                    <p class="feature-description">[DETAILS ABOUT SECURITY AUDITS AND ASSESSMENTS]</p>
+                </div>
+                <div class="security-feature">
+                    <div class="feature-icon">🚨</div>
+                    <h3 class="feature-title">Incident Response</h3>
+                    <p class="feature-description">[DETAILS ABOUT INCIDENT RESPONSE PROCEDURES]</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Compliance Section -->
+    <section class="compliance-section">
+        <div class="container">
+            <h2 class="compliance-title">Compliance & Certifications</h2>
+            <p class="compliance-subtitle">We maintain the highest standards of compliance with industry regulations and security frameworks</p>
+            <div class="compliance-badges">
+                <div class="compliance-badge">
+                    <div class="badge-icon">📜</div>
+                    <h3 class="badge-title">[COMPLIANCE 1]</h3>
+                    <p class="badge-description">[DESCRIPTION OF COMPLIANCE STANDARD]</p>
+                </div>
+                <div class="compliance-badge">
+                    <div class="badge-icon">🔒</div>
+                    <h3 class="badge-title">[COMPLIANCE 2]</h3>
+                    <p class="badge-description">[DESCRIPTION OF COMPLIANCE STANDARD]</p>
+                </div>
+                <div class="compliance-badge">
+                    <div class="badge-icon">🛡️</div>
+                    <h3 class="badge-title">[COMPLIANCE 3]</h3>
+                    <p class="badge-description">[DESCRIPTION OF COMPLIANCE STANDARD]</p>
+                </div>
+                <div class="compliance-badge">
+                    <div class="badge-icon">📋</div>
+                    <h3 class="badge-title">[COMPLIANCE 4]</h3>
+                    <p class="badge-description">[DESCRIPTION OF COMPLIANCE STANDARD]</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Details -->
+    <section class="technical-details">
+        <div class="container">
+            <h2 class="section-title">Technical Security Measures</h2>
+            <div class="details-grid">
+                <div class="detail-section">
+                    <h3 class="detail-title">🔐 Data Protection</h3>
+                    <ul class="detail-list">
+                        <li><span class="check-icon">✓</span> [ENCRYPTION STANDARD] encryption at rest</li>
+                        <li><span class="check-icon">✓</span> [ENCRYPTION STANDARD] encryption in transit</li>
+                        <li><span class="check-icon">✓</span> [DATA BACKUP DETAILS]</li>
+                        <li><span class="check-icon">✓</span> [DATA RETENTION POLICY]</li>
+                        <li><span class="check-icon">✓</span> [DATA DELETION PROCEDURES]</li>
+                    </ul>
+                </div>
+                <div class="detail-section">
+                    <h3 class="detail-title">🌐 Infrastructure Security</h3>
+                    <ul class="detail-list">
+                        <li><span class="check-icon">✓</span> [CLOUD PROVIDER] secure infrastructure</li>
+                        <li><span class="check-icon">✓</span> [NETWORK SECURITY MEASURES]</li>
+                        <li><span class="check-icon">✓</span> [FIREWALL CONFIGURATION]</li>
+                        <li><span class="check-icon">✓</span> [INTRUSION DETECTION SYSTEMS]</li>
+                        <li><span class="check-icon">✓</span> [DDOS PROTECTION]</li>
+                    </ul>
+                </div>
+                <div class="detail-section">
+                    <h3 class="detail-title">👤 Access Management</h3>
+                    <ul class="detail-list">
+                        <li><span class="check-icon">✓</span> [AUTHENTICATION METHOD]</li>
+                        <li><span class="check-icon">✓</span> [MULTI-FACTOR AUTHENTICATION]</li>
+                        <li><span class="check-icon">✓</span> [ROLE-BASED ACCESS CONTROL]</li>
+                        <li><span class="check-icon">✓</span> [SESSION MANAGEMENT]</li>
+                        <li><span class="check-icon">✓</span> [PRIVILEGED ACCESS MONITORING]</li>
+                    </ul>
+                </div>
+                <div class="detail-section">
+                    <h3 class="detail-title">📊 Monitoring & Logging</h3>
+                    <ul class="detail-list">
+                        <li><span class="check-icon">✓</span> [LOGGING STANDARDS]</li>
+                        <li><span class="check-icon">✓</span> [REAL-TIME MONITORING]</li>
+                        <li><span class="check-icon">✓</span> [ANOMALY DETECTION]</li>
+                        <li><span class="check-icon">✓</span> [AUDIT TRAIL MAINTENANCE]</li>
+                        <li><span class="check-icon">✓</span> [ALERT SYSTEMS]</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security Contact -->
+    <section class="contact-security">
+        <div class="container">
+            <h2 class="contact-title">Security Inquiries</h2>
+            <p class="contact-description">Have questions about our security practices or need to report a security issue? We're here to help.</p>
+            <div class="contact-methods">
+                <div class="contact-method">
+                    <div class="contact-method-icon">🚨</div>
+                    <h3 class="contact-method-title">Report Security Issue</h3>
+                    <p class="contact-method-description">Found a security vulnerability? Report it to our security team immediately.</p>
+                    <a href="mailto:[SECURITY_EMAIL]" class="contact-method-action">Report Issue</a>
+                </div>
+                <div class="contact-method">
+                    <div class="contact-method-icon">📋</div>
+                    <h3 class="contact-method-title">Security Documentation</h3>
+                    <p class="contact-method-description">Request detailed security documentation for enterprise compliance.</p>
+                    <a href="/contact.html" class="contact-method-action">Request Docs</a>
+                </div>
+                <div class="contact-method">
+                    <div class="contact-method-icon">🤝</div>
+                    <h3 class="contact-method-title">Compliance Questions</h3>
+                    <p class="contact-method-description">Questions about compliance standards or certifications we maintain.</p>
+                    <a href="/contact.html" class="contact-method-action">Contact Team</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Product</h4>
+                <a href="/features.html">Features</a>
+                <a href="/pricing.html">Pricing</a>
+                <a href="/integrations.html">Integrations</a>
+                <a href="/api.html">API</a>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <a href="/about.html">About Us</a>
+                <a href="/careers.html">Careers</a>
+                <a href="/press.html">Press</a>
+                <a href="/contact.html">Contact</a>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <a href="/help.html">Help Center</a>
+                <a href="/case-studies.html">Case Studies</a>
+                <a href="/blog.html">Blog</a>
+                <a href="/webinars.html">Webinars</a>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
+                <a href="/privacy.html">Privacy Policy</a>
+                <a href="/terms.html">Terms of Service</a>
+                <a href="/security.html">Security</a>
+                <a href="/compliance.html">Compliance</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 Oslira. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

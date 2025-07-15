@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" 
+          content="default-src 'self'; 
+                   script-src 'self' https://js.stripe.com https://cdn.jsdelivr.net 'unsafe-inline';
+                   style-src 'self' 'unsafe-inline';
+                   connect-src 'self' https://*.supabase.co https://*.workers.dev https://api.stripe.com;
+                   img-src 'self' data: https:;
+                   frame-src https://js.stripe.com;">
+    <title>Subscription & Billing - Oslira</title>
+    <style>
+        :root {
+            --primary-blue: #2D6CDF;
+            --secondary-purple: #8A6DF1;
+            --accent-teal: #53E1C5;
+            --text-primary: #121417;
+            --text-secondary: #6B7280;
+            --border-light: #C9CEDC;
+            --bg-light: #F5F9FF;
+            --bg-gradient: linear-gradient(135deg, #F5F9FF 0%, #E8F3FF 100%);
+            --error: #EF4444;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --shadow-primary: 0 8px 32px rgba(45, 108, 223, 0.15);
+            --shadow-hover: 0 8px 20px rgba(45, 108, 223, 0.4);
+            --border-gradient: linear-gradient(90deg, #2D6CDF, #8A6DF1, #53E1C5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        *:focus-visible {
+            outline: 3px solid var(--primary-blue);
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-display: swap;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+        }
+
+        .skip-nav {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: var(--primary-blue);
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            text-decoration: none;
+            z-index: 1000;
+        }
+
+        .skip-nav:focus {
+            top: 6px;
+        }
+
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(45, 108, 223, 0.1);
+            padding: 24px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-image {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+
+        .menu {
+            margin-bottom: 32px;
+        }
+
+        .menu-section {
+            margin-bottom: 24px;
+        }
+
+        .menu-section h4 {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            margin-bottom: 4px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+
+        .menu a:hover, .menu a.active {
+            background-color: var(--primary-blue);
+            color: white;
+            transform: translateX(2px);
+        }
+
+        .menu a .icon {
+            font-size: 18px;
+            width: 20px;
+        }
+
+        .subscription-status {
+            background: linear-gradient(135deg, var(--accent-teal) 0%, var(--secondary-purple) 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            color: white;
+        }
+
+        .subscription-status h4 {
+            margin-bottom: 8px;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .plan-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .next-billing {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .subscription-status a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.9;
+            border-bottom: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .user-info {
+            padding-top: 20px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .user-info p {
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .user-info a {
+            color: var(--secondary-purple);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 24px;
+            background: var(--bg-gradient);
+        }
+
+        /* Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: 48px;
+            background: white;
+            padding: 48px 24px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--border-gradient);
+        }
+
+        .page-header h1 {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+
+        .page-header p {
+            font-size: 20px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 32px;
+            line-height: 1.6;
+        }
+
+        /* Current Subscription Card */
+        .current-subscription {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-purple));
+            color: white;
+            padding: 32px;
+            border-radius: 16px;
+            margin-bottom: 48px;
+            text-align: center;
+        }
+
+        .current-subscription h2 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            opacity: 0.9;
+        }
+
+        .current-plan {
+            font-size: 36px;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .plan-details {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 24px;
+        }
+
+        .subscription-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Pricing Grid */
+        .pricing-section {
+            margin-bottom: 48px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .section-header h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        .section-header p {
+            font-size: 18px;
+            color: var(--text-secondary);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: white;
+            border: 2px solid var(--border-light);
+            border-radius: 16px;
+            padding: 32px;
+            position: relative;
+            padding-top: 40px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .pricing-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--border-gradient);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .pricing-card.popular {
+            border-color: var(--primary-blue);
+            background: linear-gradient(135deg, var(--bg-light), #E8F3FF);
+            transform: scale(1.05);
+        }
+
+        .pricing-card.popular:hover {
+            transform: scale(1.05) translateY(-8px);
+        }
+
+        .pricing-card.current-plan-card {
+            border-color: var(--accent-teal);
+            background: linear-gradient(135deg, #F0FDF9, #F0F9FF);
+        }
+
+        .popular-badge, .current-badge {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        .popular-badge {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-purple));
+        }
+
+        .current-badge {
+            background: linear-gradient(135deg, var(--accent-teal), var(--success));
+        }
+
+        .card-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .card-price {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .card-price .currency {
+            font-size: 24px;
+            vertical-align: top;
+        }
+
+        .card-billing {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .card-credits {
+            font-size: 14px;
+            color: var(--secondary-purple);
+            font-weight: 600;
+        }
+
+        .card-savings {
+            background: var(--accent-teal);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            margin-top: 8px;
+        }
+
+        .card-features {
+            list-style: none;
+            margin-bottom: 32px;
+        }
+
+        .card-features li {
+            padding: 8px 0;
+            color: var(--text-secondary);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-features li::before {
+            content: "✓";
+            color: var(--accent-teal);
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .card-button {
+            width: 100%;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: var(--primary-blue);
+            color: white;
+            box-shadow: 0 4px 12px rgba(45, 108, 223, 0.3);
+        }
+
+        .card-button:hover:not(:disabled) {
+            background: var(--secondary-purple);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card-button:disabled {
+            background: #9CA3AF;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .card-button.current {
+            background: var(--accent-teal);
+            cursor: default;
+        }
+
+        .pricing-card.popular .card-button {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-purple));
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Billing Section */
+        .billing-section {
+            background: white;
+            padding: 32px;
+            border-radius: 16px;
+            margin-bottom: 48px;
+            box-shadow: var(--shadow-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .billing-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--border-gradient);
+        }
+
+        .billing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .billing-header h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .manage-billing-btn {
+            background: var(--secondary-purple);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .manage-billing-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(138, 109, 241, 0.3);
+        }
+
+        .billing-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+        }
+
+        .billing-item {
+            padding: 16px;
+            background: var(--bg-light);
+            border-radius: 8px;
+            border: 1px solid var(--border-light);
+        }
+
+        .billing-item h4 {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .billing-item p {
+            font-size: 16px;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Usage History */
+        .history-section {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: var(--shadow-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .history-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--border-gradient);
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .history-header h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th {
+            background: var(--bg-light);
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .history-table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid var(--bg-light);
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .history-table tr:hover {
+            background: var(--bg-light);
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-paid {
+            background: #F0FDF9;
+            color: var(--success);
+        }
+
+        .status-pending {
+            background: #FEF3E2;
+            color: var(--warning);
+        }
+
+        .status-failed {
+            background: #FEF2F2;
+            color: var(--error);
+        }
+
+        /* Messages */
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 16px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 10000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+
+        .message.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .message.success {
+            background: linear-gradient(135deg, var(--success), #34D399);
+        }
+
+        .message.error {
+            background: linear-gradient(135deg, var(--error), #F87171);
+        }
+
+        /* Loading State */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pricing-card.popular {
+                transform: none;
+            }
+
+            .pricing-card.popular:hover {
+                transform: translateY(-8px);
+            }
+
+            .billing-header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+
+            .billing-info {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-nav">Skip to main content</a>
+    
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="./assets/oslira-logo.png" alt="Oslira Logo" class="logo-image">
+                Oslira
+            </div>
+            
+            <nav class="menu">
+                <div class="menu-section">
+                    <h4>Main</h4>
+                    <a href="/dashboard.html">
+                        <span class="icon">📊</span>
+                        Dashboard
+                    </a>
+                    <a href="/leads.html">
+                        <span class="icon">🔍</span>
+                        Lead Intelligence
+                    </a>
+                    <a href="/analytics.html">
+                        <span class="icon">📈</span>
+                        Analytics
+                    </a>
+                </div>
+                
+                <div class="menu-section">
+                    <h4>Tools</h4>
+                    <a href="/bulk-upload.html">
+                        <span class="icon">📤</span>
+                        Bulk Research
+                    </a>
+                    <a href="/messages.html">
+                        <span class="icon">💬</span>
+                        Message Studio
+                    </a>
+                    <a href="/integrations.html">
+                        <span class="icon">🔗</span>
+                        Integrations
+                    </a>
+                </div>
+                
+                <div class="menu-section">
+                    <h4>Account</h4>
+                    <a href="/subscription.html" class="active">
+                        <span class="icon">💳</span>
+                        Subscription & Billing
+                    </a>
+                    <a href="/settings.html">
+                        <span class="icon">⚙️</span>
+                        Settings
+                    </a>
+                </div>
+            </nav>
+            
+            <div class="subscription-status">
+                <h4>Current Plan</h4>
+                <p class="plan-name" id="sidebar-plan">Loading...</p>
+                <p class="next-billing" id="sidebar-billing">Next billing: Loading...</p>
+            </div>
+            
+            <div class="user-info">
+                <p id="user-email">Loading...</p>
+                <a href="#" id="logout-link">Sign Out</a>
+            </div>
+        </aside>
+        
+        <main role="main" id="main-content" class="main-content">
+            <!-- Page Header -->
+            <header class="page-header">
+                <h1>Subscription & Billing</h1>
+                <p>Manage your monthly subscription and billing preferences. Scale your lead research with flexible plans designed for growing teams.</p>
+            </header>
+
+            <!-- Current Subscription -->
+            <section class="current-subscription">
+                <h2>Your Current Plan</h2>
+                <div class="current-plan" id="current-plan-name">Free Plan</div>
+                <div class="plan-details" id="plan-details">0 monthly credits • Limited features</div>
+                <div class="subscription-info" id="subscription-info">
+                    💡 <strong>Upgrade today</strong> to unlock unlimited lead analysis and advanced features
+                </div>
+            </section>
+
+            <!-- Pricing Section -->
+            <section class="pricing-section">
+                <div class="section-header">
+                    <h2>Choose Your Monthly Plan</h2>
+                    <p>Flexible monthly subscriptions that scale with your business needs</p>
+                </div>
+
+                <div class="pricing-grid">
+                    <!-- Starter Plan -->
+                    <div class="pricing-card" data-plan="starter">
+                        <div class="card-header">
+                            <h3 class="card-title">Starter</h3>
+                            <div class="card-price">
+                                <span class="currency">$</span>29
+                            </div>
+                            <div class="card-billing">per month</div>
+                            <div class="card-credits">50 monthly credits included</div>
+                        </div>
+                        <ul class="card-features">
+                            <li>50 lead analyses per month</li>
+                            <li>Basic lead intelligence</li>
+                            <li>Email support</li>
+                            <li>Standard analytics dashboard</li>
+                            <li>CSV export</li>
+                            <li>Basic API access</li>
+                        </ul>
+                        <button class="card-button">
+                            Start Free Trial
+                        </button>
+                    </div>
+
+                    <!-- Growth Plan - Popular -->
+                    <div class="pricing-card popular" data-plan="growth">
+                        <div class="popular-badge">Most Popular</div>
+                        <div class="card-header">
+                            <h3 class="card-title">Growth</h3>
+                            <div class="card-price">
+                                <span class="currency">$</span>79
+                            </div>
+                            <div class="card-billing">per month</div>
+                            <div class="card-credits">150 monthly credits included</div>
+                            <div class="card-savings">Save $8/month vs Starter</div>
+                        </div>
+                        <ul class="card-features">
+                            <li>150 lead analyses per month</li>
+                            <li>Advanced lead intelligence</li>
+                            <li>Priority email support</li>
+                            <li>Advanced analytics & reporting</li>
+                            <li>Full API access</li>
+                            <li>Bulk processing (up to 100)</li>
+                            <li>Custom integrations</li>
+                            <li>Team collaboration tools</li>
+                        </ul>
+                        <button class="card-button">
+                            Start Free Trial
+                        </button>
+                    </div>
+
+                    <!-- Professional Plan -->
+                    <div class="pricing-card" data-plan="professional">
+                        <div class="card-header">
+                            <h3 class="card-title">Professional</h3>
+                            <div class="card-price">
+                                <span class="currency">$</span>199
+                            </div>
+                            <div class="card-billing">per month</div>
+                            <div class="card-credits">500 monthly credits included</div>
+                            <div class="card-savings">Save $37/month vs Growth</div>
+                        </div>
+                        <ul class="card-features">
+                            <li>500 lead analyses per month</li>
+                            <li>Premium lead intelligence</li>
+                            <li>Live chat support</li>
+                            <li>Advanced reporting suite</li>
+                            <li>Unlimited API access</li>
+                            <li>Bulk processing (up to 500)</li>
+                            <li>White-label options</li>
+                            <li>Priority processing queue</li>
+                            <li>Advanced team management</li>
+                            <li>Custom data enrichment</li>
+                        </ul>
+                        <button class="card-button">
+                            Start Free Trial
+                        </button>
+                    </div>
+
+                    <!-- Enterprise Plan -->
+                    <div class="pricing-card" data-plan="enterprise">
+                        <div class="card-header">
+                            <h3 class="card-title">Enterprise</h3>
+                            <div class="card-price">
+                                <span class="currency">$</span>499
+                            </div>
+                            <div class="card-billing">per month</div>
+                            <div class="card-credits">Unlimited monthly credits</div>
+                            <div class="card-savings">Best value for teams</div>
+                        </div>
+                        <ul class="card-features">
+                            <li>Unlimited lead analyses</li>
+                            <li>Enterprise lead intelligence</li>
+                            <li>24/7 phone & chat support</li>
+                            <li>Dedicated account manager</li>
+                            <li>Custom AI model training</li>
+                            <li>SLA guarantees (99.9% uptime)</li>
+                            <li>Unlimited bulk processing</li>
+                            <li>On-premise deployment option</li>
+                            <li>Advanced security & compliance</li>
+                            <li>Custom reporting & analytics</li>
+                            <li>SSO integration</li>
+                            <li>Priority feature requests</li>
+                        </ul>
+                        <button class="card-button">
+                            Contact Sales
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Billing Information -->
+            <section class="billing-section">
+                <div class="billing-header">
+                    <h3>Billing Information</h3>
+                    <button class="manage-billing-btn" id="manage-billing-btn">
+                        Manage Billing
+                    </button>
+                </div>
+                
+                <div class="billing-info">
+                    <div class="billing-item">
+                        <h4>Current Plan</h4>
+                        <p id="billing-current-plan">Free Plan</p>
+                    </div>
+                    <div class="billing-item">
+                        <h4>Next Billing Date</h4>
+                        <p id="next-billing-date">No active subscription</p>
+                    </div>
+                    <div class="billing-item">
+                        <h4>Monthly Cost</h4>
+                        <p id="monthly-cost">$0.00</p>
+                    </div>
+                    <div class="billing-item">
+                        <h4>Credits Remaining</h4>
+                        <p id="credits-remaining">0 / 0</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Billing History -->
+            <section class="history-section">
+                <div class="history-header">
+                    <h3>Billing History</h3>
+                </div>
+                
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Invoice</th>
+                        </tr>
+                    </thead>
+                    <tbody id="billing-history">
+                        <!-- Data populated by JavaScript -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
+
+    <script>
+        // Global state
+        let supabase = null;
+        let currentUser = null;
+        let currentSession = null;
+        let stripe = null;
+        let config = null;
+
+        // Initialize page when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePage();
+            setupEventListeners();
+        });
+
+        // Set up all event listeners
+        function setupEventListeners() {
+            // Logout
+            document.getElementById('logout-link').addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
+
+            // Manage billing button
+            document.getElementById('manage-billing-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                manageBilling();
+            });
+
+            // Plan subscription buttons
+            document.querySelectorAll('.card-button').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const card = this.closest('.pricing-card');
+                    const plan = card.getAttribute('data-plan');
+                    const priceText = card.querySelector('.card-price').textContent;
+                    const price = parseInt(priceText.replace(/[^0-9]/g, ''));
+                    subscribeToplan(plan, price, this);
+                });
+            });
+        }
+
+        // Initialize page
+        async function initializePage() {
+            try {
+                // Wait for Supabase to be available
+                let attempts = 0;
+                while (typeof window.supabase === 'undefined' && attempts < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+
+                if (typeof window.supabase === 'undefined') {
+                    throw new Error('Supabase library not available');
+                }
+
+                // Get configuration from API
+                config = await fetchConfig();
+                
+                // Initialize Supabase client
+                supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+                
+                // Initialize Stripe
+                if (config.stripePublishableKey) {
+                    stripe = Stripe(config.stripePublishableKey);
+                }
+                
+                // Check authentication
+                await checkAuth();
+                
+                // Load user data
+                await loadSubscriptionData();
+                await loadBillingHistory();
+                
+                // Handle URL parameters
+                handleUrlParams();
+
+            } catch (error) {
+                console.error('Initialization error:', error);
+                showMessage(`Initialization failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Fetch configuration from API
+        async function fetchConfig() {
+            try {
+                const response = await fetch('/api/config');
+                
+                if (!response.ok) {
+                    throw new Error(`Config API returned ${response.status}: ${response.statusText}`);
+                }
+                
+                const configData = await response.json();
+                
+                if (configData.error) {
+                    throw new Error(configData.error);
+                }
+
+                if (!configData.supabaseUrl || !configData.supabaseAnonKey) {
+                    throw new Error('Invalid configuration received from API');
+                }
+
+                console.log('✅ Config loaded successfully');
+                return configData;
+
+            } catch (error) {
+                throw new Error(`Failed to load configuration: ${error.message}`);
+            }
+        }
+
+        // Authentication check
+        async function checkAuth() {
+            try {
+                const { data: { session }, error } = await supabase.auth.getSession();
+                
+                if (error || !session) {
+                    window.location.href = 'auth.html';
+                    return;
+                }
+                
+                currentSession = session;
+                currentUser = session.user;
+                document.getElementById('user-email').textContent = currentUser.email;
+                
+            } catch (err) {
+                console.error('Auth check failed:', err);
+                window.location.href = 'auth.html';
+            }
+        }
+
+        // Load subscription data
+        async function loadSubscriptionData() {
+            try {
+                const { data: userData, error } = await supabase
+                    .from('users')
+                    .select('subscription_plan, subscription_status, credits, billing_cycle_end')
+                    .eq('id', currentUser.id)
+                    .single();
+                
+                if (error) {
+                    console.warn('User data not accessible:', error);
+                    updateUIWithPlan('free', 'active', 0, null);
+                    return;
+                }
+                
+                const plan = userData?.subscription_plan || 'free';
+                const status = userData?.subscription_status || 'active';
+                const credits = userData?.credits || 0;
+                const billingEnd = userData?.billing_cycle_end;
+                
+                updateUIWithPlan(plan, status, credits, billingEnd);
+                
+            } catch (err) {
+                console.error('Error loading subscription data:', err);
+                updateUIWithPlan('free', 'active', 0, null);
+            }
+        }
+
+        // Update UI with plan data
+        function updateUIWithPlan(plan, status, credits, billingEnd) {
+            const planNames = {
+                free: 'Free Plan',
+                starter: 'Starter Plan',
+                growth: 'Growth Plan',
+                professional: 'Professional Plan',
+                enterprise: 'Enterprise Plan'
+            };
+
+            const planCredits = {
+                free: 0,
+                starter: 50,
+                growth: 150,
+                professional: 500,
+                enterprise: 'Unlimited'
+            };
+
+            const planPrices = {
+                free: 0,
+                starter: 29,
+                growth: 79,
+                professional: 199,
+                enterprise: 499
+            };
+
+            const planName = planNames[plan] || 'Free Plan';
+            const planCredit = planCredits[plan] || 0;
+            const planPrice = planPrices[plan] || 0;
+
+            // Update current plan display
+            document.getElementById('current-plan-name').textContent = planName;
+            document.getElementById('sidebar-plan').textContent = planName;
+            
+            // Update plan details
+            if (plan === 'free') {
+                document.getElementById('plan-details').textContent = '0 monthly credits • Limited features';
+                document.getElementById('subscription-info').innerHTML = '💡 <strong>Upgrade today</strong> to unlock unlimited lead analysis and advanced features';
+            } else {
+                const creditText = planCredit === 'Unlimited' ? 'Unlimited' : `${planCredit} monthly`;
+                document.getElementById('plan-details').textContent = `${creditText} credits • Full features included`;
+                
+                if (billingEnd) {
+                    const nextBilling = new Date(billingEnd).toLocaleDateString();
+                    document.getElementById('subscription-info').innerHTML = `🔄 <strong>Next billing:</strong> ${nextBilling} • Auto-renewal enabled`;
+                    document.getElementById('sidebar-billing').textContent = `Next billing: ${nextBilling}`;
+                } else {
+                    document.getElementById('subscription-info').innerHTML = '✅ <strong>Active subscription</strong> • Auto-renewal enabled';
+                    document.getElementById('sidebar-billing').textContent = 'Active subscription';
+                }
+            }
+
+            // Update billing info
+            document.getElementById('billing-current-plan').textContent = planName;
+            document.getElementById('monthly-cost').textContent = `${planPrice}.00`;
+            
+            if (billingEnd) {
+                document.getElementById('next-billing-date').textContent = new Date(billingEnd).toLocaleDateString();
+            } else {
+                document.getElementById('next-billing-date').textContent = plan === 'free' ? 'No active subscription' : 'Contact support';
+            }
+
+            // Update credits display
+            if (planCredit === 'Unlimited') {
+                document.getElementById('credits-remaining').textContent = 'Unlimited';
+            } else {
+                document.getElementById('credits-remaining').textContent = `${credits} / ${planCredit}`;
+            }
+
+            // Update pricing cards
+            updatePricingCards(plan);
+        }
+
+        // Update pricing cards to show current plan
+        function updatePricingCards(currentPlan) {
+            document.querySelectorAll('.pricing-card').forEach(card => {
+                const cardPlan = card.getAttribute('data-plan');
+                const button = card.querySelector('.card-button');
+                
+                // Remove existing badges
+                const existingBadge = card.querySelector('.current-badge');
+                if (existingBadge) existingBadge.remove();
+                
+                if (cardPlan === currentPlan) {
+                    card.classList.add('current-plan-card');
+                    
+                    // Add current plan badge
+                    const badge = document.createElement('div');
+                    badge.className = 'current-badge';
+                    badge.textContent = 'Current Plan';
+                    card.appendChild(badge);
+                    
+                    button.textContent = 'Current Plan';
+                    button.classList.add('current');
+                    button.disabled = true;
+                } else {
+                    card.classList.remove('current-plan-card');
+                    
+                    button.classList.remove('current');
+                    button.disabled = false;
+                    
+                    if (cardPlan === 'enterprise') {
+                        button.textContent = 'Contact Sales';
+                    } else {
+                        button.textContent = currentPlan === 'free' ? 'Start Free Trial' : 'Switch Plan';
+                    }
+                }
+            });
+        }
+
+        // Load billing history
+        async function loadBillingHistory() {
+            try {
+                const { data: invoices, error } = await supabase
+                    .from('billing_history')
+                    .select('*')
+                    .eq('user_id', currentUser.id)
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+                
+                const historyTable = document.getElementById('billing-history');
+                
+                if (error) {
+                    console.warn('Billing history not accessible:', error);
+                    historyTable.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                                No billing history yet. Subscribe to a plan to see your invoices here.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                if (invoices && invoices.length > 0) {
+                    historyTable.innerHTML = invoices.map(invoice => {
+                        const date = new Date(invoice.created_at).toLocaleDateString();
+                        const amount = `${(invoice.amount / 100).toFixed(2)}`;
+                        const status = invoice.status || 'pending';
+                        
+                        let statusClass = 'status-pending';
+                        if (status === 'paid') statusClass = 'status-paid';
+                        if (status === 'failed') statusClass = 'status-failed';
+                        
+                        return `
+                            <tr>
+                                <td>${date}</td>
+                                <td>${invoice.description || 'Monthly subscription'}</td>
+                                <td>${amount}</td>
+                                <td><span class="status-badge ${statusClass}">${status}</span></td>
+                                <td>
+                                    ${invoice.invoice_url ? 
+                                        `<a href="${invoice.invoice_url}" target="_blank" style="color: var(--primary-blue);">View</a>` : 
+                                        '-'
+                                    }
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                } else {
+                    historyTable.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                                No billing history yet. Subscribe to a plan to see your invoices here.
+                            </td>
+                        </tr>
+                    `;
+                }
+                
+            } catch (err) {
+                console.error('Error loading billing history:', err);
+                document.getElementById('billing-history').innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px; color: var(--warning);">
+                            Unable to load billing history
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Subscribe to plan - WITH CORRECT PRICE IDs
+        async function subscribeToplan(plan, price, buttonElement) {
+            if (plan === 'enterprise') {
+                window.open('mailto:sales@oslira.com?subject=Enterprise Plan Inquiry&body=Hi, I\'m interested in the Enterprise plan for Oslira. Please contact me to discuss pricing and features.', '_blank');
+                return;
+            }
+
+            const button = buttonElement;
+            const originalText = button.textContent;
+            
+            try {
+                button.textContent = '🔄 Processing...';
+                button.disabled = true;
+
+                // Check authentication
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                if (sessionError || !session) {
+                    showMessage('Please log in to subscribe', 'error');
+                    window.location.href = 'auth.html';
+                    return;
+                }
+
+                // YOUR ACTUAL STRIPE PRICE IDs
+                const priceIds = {
+                    starter: 'price_1RkCKjJzvcRSqGG3Hq4WNNSU',     // Starter: $29/month
+                    growth: 'price_1RkCLGJzvcRSqGG3XqDyhYZN',      // Growth: $79/month  
+                    professional: 'price_1RkCLtJzvcRSqGG30FfJSpau' // Professional: $199/month
+                };
+
+                const priceId = priceIds[plan];
+                if (!priceId) {
+                    throw new Error('Price ID not configured for plan: ' + plan);
+                }
+
+                console.log(`🔄 Creating subscription for ${plan} with price_id: ${priceId}`);
+
+                // Create checkout session using your updated worker endpoint
+                const response = await fetch(`${config.workerUrl}/billing/create-checkout-session`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${session.access_token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        price_id: priceId,
+                        customer_email: session.user.email,
+                        success_url: `${window.location.origin}/subscription.html?success=true&session_id={CHECKOUT_SESSION_ID}`,
+                        cancel_url: `${window.location.origin}/subscription.html?canceled=true`,
+                        metadata: {
+                            user_id: session.user.id,
+                            plan: plan
+                        },
+                        trial_period_days: 7
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('❌ Subscription creation failed:', errorData);
+                    throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('✅ Checkout session created:', data);
+                
+                if (!data.url) {
+                    throw new Error('No checkout URL received from server');
+                }
+
+                // Redirect to Stripe Checkout
+                window.location.href = data.url;
+
+            } catch (err) {
+                console.error('❌ Subscription error:', err);
+                showMessage('Subscription failed: ' + err.message, 'error');
+                
+                // Reset button
+                button.textContent = originalText;
+                button.disabled = false;
+            }
+        }
+
+        // Manage billing
+        async function manageBilling() {
+            try {
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                if (sessionError || !session) {
+                    showMessage('Please log in to manage billing', 'error');
+                    return;
+                }
+
+                console.log('🔄 Creating billing portal session...');
+
+                const response = await fetch(`${config.workerUrl}/billing/create-portal-session`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${session.access_token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        customer_email: session.user.email,
+                        return_url: window.location.href
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('❌ Portal creation failed:', errorData);
+                    throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                console.log('✅ Portal session created');
+                
+                if (!data.url) {
+                    throw new Error('No portal URL received from server');
+                }
+
+                // Redirect to Stripe Customer Portal
+                window.location.href = data.url;
+
+            } catch (err) {
+                console.error('❌ Billing portal error:', err);
+                showMessage('Unable to access billing portal: ' + err.message, 'error');
+            }
+        }
+
+        // Handle URL parameters
+        function handleUrlParams() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.get('success') === 'true') {
+                showMessage('🎉 Subscription activated! Welcome to your new plan.', 'success');
+                window.history.replaceState({}, document.title, window.location.pathname);
+                setTimeout(async () => {
+                    await loadSubscriptionData();
+                    await loadBillingHistory();
+                }, 1000);
+            }
+            
+            if (urlParams.get('canceled') === 'true') {
+                showMessage('Subscription setup was canceled. No charges were made.', 'error');
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+
+        // Show message function
+        function showMessage(text, type = 'success') {
+            const existingMessages = document.querySelectorAll('.message');
+            existingMessages.forEach(msg => msg.remove());
+
+            const message = document.createElement('div');
+            message.className = `message ${type}`;
+            message.textContent = text;
+            document.body.appendChild(message);
+
+            setTimeout(() => message.classList.add('show'), 100);
+
+            setTimeout(() => {
+                message.classList.remove('show');
+                setTimeout(() => message.remove(), 300);
+            }, 5000);
+        }
+
+        // Logout function
+        function logout() {
+            if (supabase) {
+                supabase.auth.signOut().then(() => {
+                    window.location.href = 'auth.html';
+                });
+            }
+        }
+
+        // Listen for auth changes
+        window.addEventListener('load', () => {
+            if (supabase) {
+                supabase.auth.onAuthStateChange((event, session) => {
+                    if (event === 'SIGNED_OUT' || !session) {
+                        window.location.href = 'auth.html';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

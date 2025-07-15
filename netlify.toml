@@ -1,0 +1,11 @@
+[build]
+  publish = "public"
+  command = ""
+  edge_functions = "netlify/edge-functions"
+
+[functions]
+  directory = "netlify/edge-functions"
+
+[[edge_functions]]
+  path = "/api/*"
+  function = "auth"

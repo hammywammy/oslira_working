@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" 
+          content="default-src 'self'; 
+                   script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline';
+                   style-src 'self' 'unsafe-inline';
+                   connect-src 'self' https://*.supabase.co https://*.workers.dev;
+                   img-src 'self' data: https:;">
+    <title>Sign In - Oslira</title>
+    <style>
+        :root {
+            --primary-blue: #2D6CDF;
+            --secondary-purple: #8A6DF1;
+            --accent-teal: #53E1C5;
+            --text-primary: #121417;
+            --text-secondary: #6B7280;
+            --border-light: #C9CEDC;
+            --bg-light: #F5F9FF;
+            --bg-gradient: linear-gradient(135deg, #F5F9FF 0%, #E8F3FF 100%);
+            --error: #EF4444;
+            --success: #10B981;
+            --shadow-primary: 0 8px 32px rgba(45, 108, 223, 0.15);
+            --shadow-hover: 0 8px 20px rgba(45, 108, 223, 0.4);
+            --border-gradient: linear-gradient(90deg, #2D6CDF, #8A6DF1, #53E1C5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        *:focus-visible {
+            outline: 3px solid var(--primary-blue);
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .skip-nav {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: var(--primary-blue);
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            text-decoration: none;
+            z-index: 1000;
+        }
+
+        .skip-nav:focus {
+            top: 6px;
+        }
+
+        .auth-container {
+            width: 100%;
+            max-width: 480px;
+            margin: auto;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-primary);
+            padding: 48px;
+            border: 1px solid rgba(45, 108, 223, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--border-gradient);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 8px;
+            letter-spacing: -0.02em;
+        }
+
+        .auth-subtitle {
+            color: var(--text-secondary);
+            font-size: 18px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .auth-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid var(--border-light);
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.2s ease;
+            background: var(--bg-light);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(45, 108, 223, 0.1);
+        }
+
+        .form-input.error {
+            border-color: var(--error);
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-purple));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 12px rgba(45, 108, 223, 0.3);
+        }
+
+        .auth-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-hover);
+        }
+
+        .auth-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .loading-spinner {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .auth-button.loading .loading-spinner {
+            display: flex;
+        }
+
+        .auth-button.loading .button-text {
+            display: none;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            color: var(--error);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 16px;
+            display: none;
+            role: alert;
+        }
+
+        .success-state {
+            text-align: center;
+            display: none;
+        }
+
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--accent-teal), var(--secondary-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 24px;
+        }
+
+        .success-title {
+            color: var(--text-primary);
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .success-description {
+            color: var(--text-secondary);
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
+        .sent-email {
+            color: var(--primary-blue);
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .auth-card {
+                padding: 32px 24px;
+            }
+            
+            .auth-container {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#main-content" class="skip-nav">Skip to main content</a>
+    
+    <main role="main" id="main-content" class="auth-container">
+        <div class="auth-card" id="main-card">
+            <header class="auth-header">
+                <div class="logo">
+                    <h1>Welcome to Oslira</h1>
+                </div>
+                <p class="auth-subtitle">AI-powered lead intelligence platform</p>
+                <p class="auth-description">Enter your email to access your account or create a new one</p>
+            </header>
+
+            <form id="auth-form" aria-labelledby="auth-form-title">
+                <div class="error-message" id="error-display" role="alert" aria-live="polite"></div>
+                
+                <div class="form-group">
+                    <label class="form-label" for="email">Email Address</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        class="form-input" 
+                        placeholder="you@company.com" 
+                        required
+                        aria-describedby="email-error"
+                        autocomplete="email"
+                    >
+                </div>
+                
+                <button type="submit" id="submit-button" class="auth-button">
+                    <span class="button-text">Continue with Email</span>
+                    <div class="loading-spinner" aria-hidden="true">
+                        <div class="spinner"></div>
+                        <span>Sending...</span>
+                    </div>
+                </button>
+            </form>
+        </div>
+
+        <div class="auth-card success-state" id="success-card">
+            <div class="success-icon" aria-hidden="true">📧</div>
+            <h2 class="success-title">Check Your Email</h2>
+            <p class="success-description">We sent a secure login link to:</p>
+            <p class="sent-email" id="sent-email" aria-live="polite"></p>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" crossorigin="anonymous"></script>
+
+    <script>
+        // Global state
+        let supabase = null;
+        let isLoading = false;
+
+        // Clear all authentication data
+        async function clearAllAuthData() {
+            try {
+                console.log('🧹 AUTH: Clearing all authentication data...');
+                
+                // Clear browser storage first
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                // Clear cookies
+                document.cookie.split(";").forEach(function(c) { 
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+                });
+                
+                // Clear IndexedDB (where Supabase stores tokens)
+                if ('indexedDB' in window) {
+                    try {
+                        const databases = await indexedDB.databases();
+                        databases.forEach(db => {
+                            indexedDB.deleteDatabase(db.name);
+                        });
+                    } catch (e) {
+                        console.log('🧹 AUTH: Could not clear IndexedDB');
+                    }
+                }
+                
+                // If Supabase is available, force sign out
+                if (supabase) {
+                    await supabase.auth.signOut({ scope: 'global' });
+                }
+                
+                console.log('🧹 AUTH: All auth data cleared successfully');
+            } catch (error) {
+                console.error('🧹 AUTH: Error clearing auth data:', error);
+            }
+        }
+
+        // Initialize authentication system
+        async function initializeAuth() {
+            try {
+                // Wait for Supabase to be available
+                let attempts = 0;
+                while (typeof window.supabase === 'undefined' && attempts < 50) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+
+                if (typeof window.supabase === 'undefined') {
+                    throw new Error('Supabase library not available');
+                }
+
+                // Get configuration from API
+                const config = await fetchConfig();
+                
+                // Initialize Supabase client
+                supabase = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey);
+                
+                // Check for existing session or magic link
+                await handleExistingAuth();
+
+                // Set up form handler
+                setupFormHandler();
+
+            } catch (error) {
+                showError(`Authentication setup failed: ${error.message}`);
+            }
+        }
+
+        // Fetch configuration from API
+        async function fetchConfig() {
+            try {
+                const response = await fetch('/api/config');
+                
+                if (!response.ok) {
+                    throw new Error(`Config API returned ${response.status}: ${response.statusText}`);
+                }
+                
+                const config = await response.json();
+                
+                if (config.error) {
+                    throw new Error(config.error);
+                }
+
+                if (!config.supabaseUrl || !config.supabaseAnonKey) {
+                    throw new Error('Invalid configuration received from API');
+                }
+
+                return config;
+
+            } catch (error) {
+                throw new Error(`Failed to load configuration: ${error.message}`);
+            }
+        }
+
+        // Handle existing authentication
+        async function handleExistingAuth() {
+            try {
+                // Check URL for magic link parameters first
+                const urlParams = new URLSearchParams(window.location.search);
+                const hashParams = new URLSearchParams(window.location.hash.substring(1));
+                
+                const accessToken = hashParams.get('access_token') || urlParams.get('access_token');
+                const refreshToken = hashParams.get('refresh_token') || urlParams.get('refresh_token');
+                const error = hashParams.get('error') || urlParams.get('error');
+
+                if (error) {
+                    console.log('🔍 AUTH: URL contains auth error:', error);
+                    cleanUrl();
+                    showError('Authentication failed. Please try again.');
+                    return;
+                }
+
+                if (accessToken && refreshToken) {
+                    console.log('🔍 AUTH: Found magic link tokens in URL');
+                    await handleMagicLink(accessToken, refreshToken);
+                    return;
+                }
+
+                // Check for existing session - be more lenient
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+                
+                if (sessionError) {
+                    console.log('🔍 AUTH: Session error:', sessionError.message);
+                    // Don't clear data immediately - could be network issue
+                    return;
+                }
+                
+                if (session && session.user) {
+                    console.log('🔍 AUTH: Found existing session for user:', session.user?.email || 'Unknown email');
+                    console.log('🔍 AUTH: User ID:', session.user?.id || 'Unknown ID');
+                    console.log('🔍 AUTH: Session expires:', new Date(session.expires_at * 1000).toLocaleString());
+                    
+                    // Check if session is still valid (not expired)
+                    const now = Date.now() / 1000;
+                    if (session.expires_at && session.expires_at > now) {
+                        console.log('🔍 AUTH: Valid session found, redirecting...');
+                        await redirectToDashboard();
+                        return;
+                    } else {
+                        console.log('🔍 AUTH: Session expired, clearing...');
+                        await clearAllAuthData();
+                        return;
+                    }
+                } else {
+                    console.log('🔍 AUTH: No existing session found - ready for fresh login');
+                }
+
+            } catch (error) {
+                console.error('🔍 AUTH: Auth check failed:', error);
+                // Don't clear auth data for network errors
+            }
+        }
+
+        // Handle magic link authentication
+        async function handleMagicLink(accessToken, refreshToken) {
+            try {
+                console.log('🔍 AUTH: Processing magic link authentication...');
+                
+                const { data, error } = await supabase.auth.setSession({
+                    access_token: accessToken,
+                    refresh_token: refreshToken
+                });
+
+                if (error) {
+                    console.log('🔍 AUTH: Magic link session error:', error.message);
+                    throw error;
+                }
+
+                console.log('🔍 AUTH: Magic link successful for user:', data.user?.email || 'Unknown email');
+                console.log('🔍 AUTH: New user ID:', data.user?.id || 'Unknown ID');
+                
+                cleanUrl();
+                await redirectToDashboard();
+
+            } catch (error) {
+                console.error('🔍 AUTH: Magic link failed:', error.message);
+                cleanUrl();
+                await clearAllAuthData();
+                showError('There was a problem with your login link. Please try signing in again.');
+            }
+        }
+
+        // Redirect to dashboard
+        async function redirectToDashboard() {
+            try {
+                // Check if user has completed onboarding by checking for business profiles
+                const { data: businessProfiles, error } = await supabase
+                    .from('business_profiles')
+                    .select('id, business_name')
+                    .limit(1);
+                
+                if (error) {
+                    console.log('🔍 AUTH: Error checking business profiles, assuming new user:', error.message);
+                    // If we can't check, assume new user and send to onboarding
+                    window.location.href = 'onboarding.html';
+                    return;
+                }
+                
+                if (!businessProfiles || businessProfiles.length === 0) {
+                    console.log('🔍 AUTH: No business profiles found - redirecting to onboarding');
+                    window.location.href = 'onboarding.html';
+                } else {
+                    console.log('🔍 AUTH: Business profiles found - redirecting to dashboard');
+                    
+                    // Check for demo context
+                    const demoUsername = sessionStorage.getItem('demo_username');
+                    if (demoUsername) {
+                        sessionStorage.removeItem('demo_username');
+                        window.location.href = `dashboard.html?demo_analysis=${encodeURIComponent(demoUsername)}`;
+                        return;
+                    }
+                    
+                    // Default redirect to dashboard
+                    window.location.href = 'dashboard.html';
+                }
+            } catch (error) {
+                console.error('🔍 AUTH: Error during redirect logic:', error);
+                // Default to onboarding if there's any error
+                window.location.href = 'onboarding.html';
+            }
+        }
+
+        // Clean authentication parameters from URL
+        function cleanUrl() {
+            const url = new URL(window.location);
+            const params = ['access_token', 'refresh_token', 'token_type', 'expires_in', 'error', 'error_description'];
+            
+            params.forEach(param => {
+                url.searchParams.delete(param);
+                url.hash = url.hash.replace(new RegExp(`[&?]${param}=[^&]*`, 'g'), '');
+            });
+            
+            window.history.replaceState(null, '', url.toString());
+        }
+
+        // Set up form submission handler
+        function setupFormHandler() {
+            const form = document.getElementById('auth-form');
+            form.addEventListener('submit', handleFormSubmit);
+        }
+
+        // Handle form submission
+        async function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            if (isLoading) return;
+
+            const email = document.getElementById('email').value.trim();
+            const button = document.getElementById('submit-button');
+            const emailInput = document.getElementById('email');
+
+            console.log('🔍 AUTH: Form submission for email:', email);
+
+            // Clear previous errors
+            clearError();
+            emailInput.classList.remove('error');
+
+            // Validate email
+            if (!email || !isValidEmail(email)) {
+                console.log('🔍 AUTH: Invalid email format');
+                showError('Please enter a valid email address');
+                emailInput.classList.add('error');
+                emailInput.focus();
+                return;
+            }
+
+            // Smart rate limiting - only prevent actual abuse
+            const sessionKey = `auth_attempts_${Date.now().toString().slice(0, -5)}`; // 10-minute windows
+            const emailKey = `email_attempts_${email}`;
+            
+            const sessionAttempts = JSON.parse(sessionStorage.getItem(sessionKey) || '[]');
+            const emailAttempts = JSON.parse(localStorage.getItem(emailKey) || '{"attempts": [], "lastSuccess": 0}');
+            
+            const now = Date.now();
+            const fiveMinutesAgo = now - 5 * 60 * 1000;
+            const oneHourAgo = now - 60 * 60 * 1000;
+            
+            // Clean old attempts
+            const recentSessionAttempts = sessionAttempts.filter(time => time > fiveMinutesAgo);
+            const recentEmailAttempts = emailAttempts.attempts.filter(time => time > oneHourAgo);
+            
+            // Abuse detection
+            const isSessionAbuse = recentSessionAttempts.length >= 5; // 5 attempts in 5 minutes from same browser
+            const isEmailAbuse = recentEmailAttempts.length >= 3; // 3 attempts in 1 hour for same email
+            const hasRecentSuccess = emailAttempts.lastSuccess > fiveMinutesAgo; // Had success in last 5 minutes
+            
+            if (isSessionAbuse) {
+                console.log('🔍 AUTH: Session abuse detected - too many attempts from this browser');
+                showError('Too many attempts from this browser. Please wait 5 minutes.');
+                return;
+            }
+            
+            if (isEmailAbuse && !hasRecentSuccess) {
+                console.log('🔍 AUTH: Email abuse detected - too many attempts for this email');
+                const nextAttempt = new Date(Math.max(...recentEmailAttempts) + 60 * 60 * 1000);
+                showError(`Too many attempts for this email. Try again after ${nextAttempt.toLocaleTimeString()}.`);
+                return;
+            }
+
+            // Record this attempt
+            recentSessionAttempts.push(now);
+            recentEmailAttempts.push(now);
+            
+            sessionStorage.setItem(sessionKey, JSON.stringify(recentSessionAttempts));
+            localStorage.setItem(emailKey, JSON.stringify({
+                attempts: recentEmailAttempts,
+                lastSuccess: emailAttempts.lastSuccess
+            }));
+
+            // Show loading state
+            isLoading = true;
+            button.disabled = true;
+            button.classList.add('loading');
+            console.log('🔍 AUTH: Sending magic link...');
+
+            try {
+                const { error } = await supabase.auth.signInWithOtp({
+                    email: email,
+                    options: {
+                        emailRedirectTo: window.location.origin + '/auth.html',
+                        shouldCreateUser: true
+                    }
+                });
+
+                if (error) {
+                    console.log('🔍 AUTH: Supabase error:', error.message);
+                    throw error;
+                }
+
+                // Mark successful attempt
+                localStorage.setItem(emailKey, JSON.stringify({
+                    attempts: [],
+                    lastSuccess: now
+                }));
+
+                console.log('🔍 AUTH: Magic link sent successfully to:', email);
+                showSuccess(email);
+
+            } catch (error) {
+                console.error('🔍 AUTH: Form submission error:', error);
+                
+                let errorMessage = 'Unable to send login link. Please try again.';
+                
+                if (error.message.includes('rate limit') || error.message.includes('too many')) {
+                    // Remove our attempt record if Supabase rate limited us
+                    const currentData = JSON.parse(localStorage.getItem(emailKey) || '{"attempts": [], "lastSuccess": 0}');
+                    currentData.attempts.pop(); // Remove the last attempt
+                    localStorage.setItem(emailKey, JSON.stringify(currentData));
+                    
+                    errorMessage = 'Server rate limit reached. Please wait a moment and try again.';
+                } else if (error.message.includes('invalid') || error.message.includes('malformed')) {
+                    errorMessage = 'Please check your email address and try again.';
+                }
+                
+                showError(errorMessage);
+                emailInput.classList.add('error');
+                emailInput.focus();
+
+            } finally {
+                isLoading = false;
+                button.disabled = false;
+                button.classList.remove('loading');
+            }
+        }
+
+        // Utility functions
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('error-display');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            errorEl.focus();
+            
+            setTimeout(() => {
+                errorEl.style.display = 'none';
+            }, 5000);
+        }
+
+        function clearError() {
+            const errorEl = document.getElementById('error-display');
+            errorEl.style.display = 'none';
+        }
+
+        function showSuccess(email) {
+            document.getElementById('sent-email').textContent = email;
+            document.getElementById('main-card').style.display = 'none';
+            document.getElementById('success-card').style.display = 'block';
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAuth();
+        });
+
+        // Handle auth state changes
+        window.addEventListener('load', () => {
+            if (supabase) {
+                supabase.auth.onAuthStateChange((event, session) => {
+                    if (event === 'SIGNED_IN' && session) {
+                        redirectToDashboard();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
